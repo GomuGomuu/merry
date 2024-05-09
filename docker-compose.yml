@@ -1,11 +1,13 @@
-version: "3.4"
+version: "3.12"
 services:
   api:
     build: .
     volumes:
-      - .:/usr/src/app
+      - ./src:/usr/app
     ports:
       - "8000:8000"
+    networks:
+      - backend
     environment:
       ENV: development
     healthcheck:
@@ -19,9 +21,11 @@ services:
         condition: service_healthy
 
   postgres:
-    image: postgres:12
+    image: postgres:14-bullseye
     ports:
       - "5432:5432"
+    networks:
+      - backend
     volumes:
       - ./docker/db/pgdata:/var/lib/postgresql/data
     environment:
@@ -33,3 +37,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+networks:
+  backend:
+
+volumes:
+  pg_data:

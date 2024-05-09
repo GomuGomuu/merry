@@ -1,14 +1,15 @@
-FROM python:3.8-slim-buster
+FROM python:3.12.3
 
 ENV PYHTONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && apt-get install --yes libmagic-dev curl
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-ADD src/config/requirements.txt ./src/config/requirements.txt
-RUN  python -m pip install -U pip && pip install -r src/config/requirements.txt
-COPY . /usr/src/app
+RUN mkdir -p /usr/app
+WORKDIR /usr/app
+ADD src/config/pyproject.toml ./config/pyproject.toml
+RUN pip install poetry
+RUN poetry install -C ./config/
+COPY . /usr/app
 
 
 ENTRYPOINT ["sh", "docker-entrypoint.sh"]

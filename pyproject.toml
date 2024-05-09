@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "merry"
+version = "0.1.0"
+description = ""
+authors = ["Vitor José Stähelin <vitorjosestahelin@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "^5.0.6"
+django-environ = "^0.11.2"
+djangorestframework = "^3.15.1"
+django-cors-headers = "^4.3.1"
+gunicorn = "^22.0.0"
+psycopg2-binary = "^2.9.9"
+whitenoise = "^6.6.0"
+sentry-sdk = "^2.1.1"
+drf-spectacular = "^0.27.2"
+djangorestframework-jwt = "^1.11.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

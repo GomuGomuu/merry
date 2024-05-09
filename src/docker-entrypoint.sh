@@ -5,18 +5,12 @@ if [ -n "$1" ]; then
     exec "$@"
 fi
 
-if [ "$ENV" = "development" ] ; then
-    # Check Postgres database
-#    python docker/web/check_db.py
-    pip install -r src/config/requirements.txt
-fi
-
-python src/manage.py makemigrations
-python src/manage.py migrate                  # Apply database migrations
-python src/manage.py collectstatic --noinput  # Collect static files
+python manage.py makemigrations
+python manage.py migrate                  # Apply database migrations
+python manage.py collectstatic --noinput  # Collect static files
 
 if [ "$ENV" = "development" ] ; then
-    python src/manage.py runserver 0.0.0.0:8000
+    python manage.py runserver 0.0.0.0:8000
 else
     # Prepare log files and start outputting logs to stdout
     mkdir -p /srv/logs/
