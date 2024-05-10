@@ -1,16 +1,19 @@
 import uuid
+from datetime import date
 
 from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
 from django.db import models
 from sorl.thumbnail import ImageField, get_thumbnail
 
+from api.core.utils import slugify
+
 
 class AbstractImage(models.Model):
     class Meta:
         abstract = True
 
-    src = ImageField(upload_to="static/img/cards", max_length=255)
+    src = ImageField(upload_to="img/", max_length=255)
     alt = models.CharField(max_length=255, blank=True, null=True)
 
     @property
@@ -69,9 +72,9 @@ class AbstractImage(models.Model):
     def set_image(self, image, file_name=None, save=True):
         image_data = image.read()
         file_name = (
-            file_name
+            f"{date.today()}-{uuid.uuid4()}-{slugify(file_name)}.{image.content_type.split('/')[-1]}"
             if file_name
-            else f"unknown-{uuid.uuid4()}.{image.content_type.split('/')[-1]}"
+            else f"{date.today()}-{uuid.uuid4()}-unnamed.{image.content_type.split('/')[-1]}"
         )
         src = ContentFile(image_data)
         self.src.save(file_name, src, save=save)
