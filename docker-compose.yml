@@ -17,10 +17,11 @@ services:
       retries: 3
       start_period: 40s
     depends_on:
-      postgres:
+      merry-postgres:
         condition: service_healthy
 
-  postgres:
+  merry-postgres:
+    container_name: merry-postgres
     image: postgres:14-bullseye
     ports:
       - "5432:5432"
