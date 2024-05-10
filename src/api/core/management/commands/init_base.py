@@ -51,6 +51,16 @@ def create_card_types():
         Type.objects.create(name="Event")
 
 
+def creat_card_crews():
+    from api.card.models import Crew
+
+    if not Crew.objects.exists():
+        Crew.objects.create(name="Straw Hat")
+        Crew.objects.create(name="Supernovas")
+        Crew.objects.create(name="Marines")
+        Crew.objects.create(name="Whitebeard Pirates")
+
+
 class Command(BaseCommand):
     help = "Initialize base structure"
 
@@ -68,6 +78,9 @@ class Command(BaseCommand):
 
         logger.warning("Creating card types")
         create_card_types()
+
+        logger.warning("Creating card crews")
+        creat_card_crews()
 
         if settings.DEBUG:
             call_command("init_develop")

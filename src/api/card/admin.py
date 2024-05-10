@@ -46,10 +46,16 @@ admin.site.register(CardImage, CardImageAdmin)
 
 
 class CardAdmin(admin.ModelAdmin):
-    list_display = ["name", "description", "created_at", "updated_at"]
+    list_display = ["name", "crews", "created_at", "updated_at"]
     inlines = [CardImageInline]
     search_fields = ["name", "description"]
     list_filter = ["op", "is_dom", "deck_color", "type"]
+
+    def crews(self, obj):
+        print(obj.crew.all())
+        return "/".join([crew.name for crew in obj.crew.all()])
+
+    crews.short_description = "Crews"
 
 
 admin.site.register(Card, CardAdmin)

@@ -32,14 +32,28 @@ class Type(BaseModel):
         return self.name
 
 
+class Crew(BaseModel):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
 class Card(BaseModel):
     name = models.CharField(max_length=100)
     is_dom = models.BooleanField(default=False)
     cost = models.PositiveIntegerField()
     power = models.PositiveIntegerField()
     counter_value = models.PositiveIntegerField()
-    crew = models.TextField(blank=True, null=True)
+    crew = models.ManyToManyField(Crew, related_name="crews")
     description = models.TextField(blank=True, null=True)
     type = models.ForeignKey(Type, on_delete=models.PROTECT)
     op = models.ForeignKey(Op, on_delete=models.PROTECT)
     deck_color = models.ManyToManyField(DeckColor, related_name="deck_colors")
+
+    # crew string representation is all crew names separated by /
+    def crew_str(self):
+        return "/".join([crew.name for crew in self.crew.all()])
+
+    def __str__(self):
+        return self.name
