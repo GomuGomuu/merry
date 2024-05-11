@@ -18,7 +18,7 @@ class CardIllustrationForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         image_extension = instance.src.file.content_type.split("/")[-1]
-        instance.slug = f"{date.today()}-{uuid.uuid4()}-{slugify(instance.src.name[:-(len(image_extension) + 1)])}"
+        instance.slug = f"{date.today()}-{uuid.uuid4()}-{slugify(instance.code)}"
         instance.src.name = f"{instance.slug}.{image_extension}"
         if commit:
             instance.save()
@@ -50,7 +50,15 @@ class CardIllustrationInline(admin.TabularInline):
         return (
             (
                 None,
-                {"fields": ("image_preview", "src", "art_type", "is_alternative_art")},
+                {
+                    "fields": (
+                        "image_preview",
+                        "code",
+                        "src",
+                        "art_type",
+                        "is_alternative_art",
+                    )
+                },
             ),
         )
 

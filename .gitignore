@@ -98,3 +98,4 @@ static/
 #IDES
 .idea/
 /.obsidian/
+/src/api/media/img/*

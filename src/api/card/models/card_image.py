@@ -15,6 +15,17 @@ class CardIllustration(AbstractImage):
     )
     art_type = models.CharField(max_length=100, choices=types)
     is_alternative_art = models.BooleanField(default=False)
+    code = models.CharField(max_length=100)
+
+    class Meta:
+        unique_together = ("card", "code")
 
     def __str__(self):
-        return self.card.name
+        text = f"{self.card} - {self.code} - {self.art_type}"
+        if self.is_alternative_art:
+            text += " (Alternative Art)"
+        return text
+
+    @property
+    def name(self):
+        return self.__str__

@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ProjectConfig(AppConfig):
+class ExchangeConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "api.project"
+    name = "api.exchange"
