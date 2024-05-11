@@ -71,10 +71,11 @@ class AbstractImage(models.Model):
 
     def set_image(self, image, file_name=None, save=True):
         image_data = image.read()
+        image_extension = image.content_type.split("/")[-1]
         file_name = (
-            f"{date.today()}-{uuid.uuid4()}-{slugify(file_name)}.{image.content_type.split('/')[-1]}"
+            f"{date.today()}-{uuid.uuid4()}-{slugify(image.src.name[:-(len(image_extension) + 1)])}.{image_extension}"
             if file_name
-            else f"{date.today()}-{uuid.uuid4()}-unnamed.{image.content_type.split('/')[-1]}"
+            else f"{date.today()}-{uuid.uuid4()}-unnamed.{image_extension}"
         )
         src = ContentFile(image_data)
         self.src.save(file_name, src, save=save)

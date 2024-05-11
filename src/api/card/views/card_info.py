@@ -6,12 +6,10 @@ from rest_framework.permissions import AllowAny
 from django.views.decorators.csrf import csrf_exempt
 from drf_spectacular.utils import extend_schema
 from api.card import docs
-from api.card.models import Card, Op, DeckColor, ArtType, Type, Crew
+from api.card.models import Card, Op, DeckColor, Crew
 from api.card.serializers.card import (
     OpSerializer,
     DeckColorSerializer,
-    ArtTypeSerializer,
-    TypeSerializer,
     CrewSerializer,
 )
 
@@ -50,42 +48,6 @@ def deck_color_list(request: Request) -> Response:
 def deck_color_detail(request: Request, pk: int) -> Response:
     deck_color_detail_response = DeckColorSerializer(DeckColor.objects.get(pk=pk))
     return Response(deck_color_detail_response.data, status=status.HTTP_200_OK)
-
-
-@extend_schema(**docs.art_type_list)
-@csrf_exempt
-@api_view(("GET",))
-@permission_classes((AllowAny,))
-def art_type_list(request: Request) -> Response:
-    art_type_list_response = ArtTypeSerializer(ArtType.objects.all(), many=True)
-    return Response(art_type_list_response.data, status=status.HTTP_200_OK)
-
-
-@extend_schema(**docs.art_type_detail)
-@csrf_exempt
-@api_view(("GET",))
-@permission_classes((AllowAny,))
-def art_type_detail(request: Request, pk: int) -> Response:
-    art_type_detail_response = ArtTypeSerializer(ArtType.objects.get(pk=pk))
-    return Response(art_type_detail_response.data, status=status.HTTP_200_OK)
-
-
-@extend_schema(**docs.type_list)
-@csrf_exempt
-@api_view(("GET",))
-@permission_classes((AllowAny,))
-def type_list(request: Request) -> Response:
-    type_list_response = TypeSerializer(Type.objects.all(), many=True)
-    return Response(type_list_response.data, status=status.HTTP_200_OK)
-
-
-@extend_schema(**docs.type_detail)
-@csrf_exempt
-@api_view(("GET",))
-@permission_classes((AllowAny,))
-def type_detail(request: Request, pk: int) -> Response:
-    type_detail_response = TypeSerializer(Type.objects.get(pk=pk))
-    return Response(type_detail_response.data, status=status.HTTP_200_OK)
 
 
 @extend_schema(**docs.crew_list)

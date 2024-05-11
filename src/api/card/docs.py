@@ -4,9 +4,9 @@ from api.card.serializers.card import (
     CardSerializer,
     OpSerializer,
     DeckColorSerializer,
-    ArtTypeSerializer,
-    TypeSerializer,
     CrewSerializer,
+    CardSerializerList,
+    CardIllustrationSerializer,
 )
 
 card_tag = "Card Management"
@@ -19,7 +19,7 @@ card_list = {
 }
 
 card_detail = {
-    "request": CardSerializer,
+    "request": CardSerializerList,
     "responses": {status.HTTP_200_OK: CardSerializer},
     "summary": "Get card",
     "tags": [card_tag],
@@ -63,57 +63,50 @@ op_detail = {
 }
 
 deck_color_list = {
-    "request": OpSerializer,
+    "request": DeckColorSerializer,
     "responses": {status.HTTP_200_OK: DeckColorSerializer(many=True)},
     "summary": "List all deck colors",
     "tags": [CARD_INFO_TAG],
 }
 
 deck_color_detail = {
-    "request": OpSerializer,
+    "request": DeckColorSerializer,
     "responses": {status.HTTP_200_OK: DeckColorSerializer},
     "summary": "Get deck color",
     "tags": [CARD_INFO_TAG],
 }
 
-art_type_list = {
-    "request": OpSerializer,
-    "responses": {status.HTTP_200_OK: ArtTypeSerializer(many=True)},
-    "summary": "List all art types",
-    "tags": [CARD_INFO_TAG],
-}
-
-art_type_detail = {
-    "request": OpSerializer,
-    "responses": {status.HTTP_200_OK: ArtTypeSerializer},
-    "summary": "Get art type",
-    "tags": [CARD_INFO_TAG],
-}
-
-type_list = {
-    "request": OpSerializer,
-    "responses": {status.HTTP_200_OK: TypeSerializer(many=True)},
-    "summary": "List all types",
-    "tags": [CARD_INFO_TAG],
-}
-
-type_detail = {
-    "request": OpSerializer,
-    "responses": {status.HTTP_200_OK: TypeSerializer},
-    "summary": "Get type",
-    "tags": [CARD_INFO_TAG],
-}
-
 crew_list = {
-    "request": OpSerializer,
+    "request": CrewSerializer,
     "responses": {status.HTTP_200_OK: CrewSerializer(many=True)},
     "summary": "List all crews",
     "tags": [CARD_INFO_TAG],
 }
 
 crew_detail = {
-    "request": OpSerializer,
+    "request": CrewSerializer,
     "responses": {status.HTTP_200_OK: CrewSerializer},
     "summary": "Get crew",
+    "tags": [CARD_INFO_TAG],
+}
+
+illustration_list = {
+    "request": CardIllustrationSerializer,
+    "responses": {status.HTTP_200_OK: CardSerializerList},
+    "summary": "List all illustrations",
+    "tags": [CARD_INFO_TAG],
+}
+
+create_card_illustration = {
+    "request": CardIllustrationSerializer,
+    "responses": {status.HTTP_201_CREATED: CardSerializer},
+    "summary": "Create illustration",
+    "tags": [CARD_INFO_TAG],
+}
+
+card_illustration_detail = {
+    "request": CardIllustrationSerializer,
+    "responses": {status.HTTP_200_OK: CardSerializer},
+    "summary": "Get illustration",
     "tags": [CARD_INFO_TAG],
 }

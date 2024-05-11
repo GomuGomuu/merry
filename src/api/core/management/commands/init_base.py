@@ -32,33 +32,17 @@ def create_deck_colors():
         DeckColor.objects.create(name="Purple")
         DeckColor.objects.create(name="Red")
         DeckColor.objects.create(name="Black")
-
-
-def create_image_tags():
-    from api.card.models import Tag
-
-    if not Tag.objects.exists():
-        Tag.objects.create(name="Principal Art", slug="principal-art")
-        Tag.objects.create(name="Alternative Art", slug="alternative-art")
-
-
-def create_card_types():
-    from api.card.models import Type
-
-    if not Type.objects.exists():
-        Type.objects.create(name="Leader")
-        Type.objects.create(name="Character")
-        Type.objects.create(name="Event")
+        DeckColor.objects.create(name="Multicolor")
 
 
 def creat_card_crews():
     from api.card.models import Crew
 
     if not Crew.objects.exists():
-        Crew.objects.create(name="Straw Hat")
-        Crew.objects.create(name="Supernovas")
-        Crew.objects.create(name="Marines")
-        Crew.objects.create(name="Whitebeard Pirates")
+        Crew.objects.create(name="Straw Hat", slug="straw-hat")
+        Crew.objects.create(name="Supernovas", slug="supernovas")
+        Crew.objects.create(name="Marines", slug="marines")
+        Crew.objects.create(name="Whitebeard Pirates", slug="whitebeard-pirates")
 
 
 class Command(BaseCommand):
@@ -67,17 +51,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         logger.warning("Initializing base structure")
 
-        logger.warning("Creating image tags")
-        create_image_tags()
-
         logger.warning("Creating card ops")
         create_card_ops()
 
         logger.warning("Creating deck colors")
         create_deck_colors()
-
-        logger.warning("Creating card types")
-        create_card_types()
 
         logger.warning("Creating card crews")
         creat_card_crews()

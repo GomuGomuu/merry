@@ -1,2 +1,2 @@
-from .card import Op, DeckColor, ArtType, Type, Card, Crew  # noqa
-from .card_image import CardImage, Tag  # noqa
+from .card import Op, DeckColor, Card, Crew  # noqa
+from .card_image import CardIllustration  # noqa

@@ -1,23 +1,36 @@
-from api.card.models import CardImage, Card, Type
+import uuid
+from datetime import date
+
+from api.card.models import CardIllustration, Card, Op, DeckColor, Crew
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django import forms
 
+from api.card.models.card import SideEffect
+from api.core.utils import slugify
 
-class CardImageForm(forms.ModelForm):
+
+class CardIllustrationForm(forms.ModelForm):
     class Meta:
-        model = CardImage
+        model = CardIllustration
         fields = "__all__"
-        widgets = {
-            "tags": forms.CheckboxSelectMultiple(),
-        }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        image_extension = instance.src.file.content_type.split("/")[-1]
+        instance.slug = f"{date.today()}-{uuid.uuid4()}-{slugify(instance.src.name[:-(len(image_extension) + 1)])}"
+        instance.src.name = f"{instance.slug}.{image_extension}"
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
 
 
-class CardImageInline(admin.TabularInline):
-    model = CardImage
+class CardIllustrationInline(admin.TabularInline):
+    model = CardIllustration
     extra = 0
     readonly_fields = ("image_preview",)
-    form = CardImageForm
+    form = CardIllustrationForm
 
     def image_preview(self, obj):
         if obj.src:
@@ -34,36 +47,78 @@ class CardImageInline(admin.TabularInline):
         fieldsets = super().get_fieldsets(request, obj)
         if not obj:
             return fieldsets
-        return ((None, {"fields": ("image_preview", "src", "tag")}),)
+        return (
+            (
+                None,
+                {"fields": ("image_preview", "src", "art_type", "is_alternative_art")},
+            ),
+        )
 
 
-class CardImageAdmin(admin.ModelAdmin):
-    list_display = ["card", "tag"]
-    search_fields = ["card", "tag"]
+class CardIllustrationAdmin(admin.ModelAdmin):
+    list_display = ["card", "art_type", "is_alternative_art"]
+    search_fields = ["card", "art_type", "is_alternative_art"]
 
 
-admin.site.register(CardImage, CardImageAdmin)
+admin.site.register(CardIllustration, CardIllustrationAdmin)
+
+
+class CardForm(forms.ModelForm):
+    class Meta:
+        model = Card
+        fields = "__all__"
+
+    # apply slugify to the name field to generate the slug and save it
+    prepopulated_fields = {"slug": ("name",)}
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.slug = slugify(instance.name)
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
 
 
 class CardAdmin(admin.ModelAdmin):
-    list_display = ["name", "crews", "created_at", "updated_at"]
-    inlines = [CardImageInline]
+    list_display = ["name", "crews", "colors", "op", "is_dom", "type"]
+    inlines = [CardIllustrationInline]
     search_fields = ["name", "description"]
     list_filter = ["op", "is_dom", "deck_color", "type"]
 
+    readonly_fields = ("slug",)
+
+    form = CardForm
+
     def crews(self, obj):
-        print(obj.crew.all())
         return "/".join([crew.name for crew in obj.crew.all()])
 
     crews.short_description = "Crews"
+
+    def colors(self, obj):
+        return "/".join([color.name for color in obj.deck_color.all()])
+
+    colors.short_description = "Colors"
 
 
 admin.site.register(Card, CardAdmin)
 
 
-class TypeAdmin(admin.ModelAdmin):
-    list_display = ["name"]
-    search_fields = ["name"]
+@admin.register(Op)
+class OpAdmin(admin.ModelAdmin):
+    pass
 
 
-admin.site.register(Type, TypeAdmin)
+@admin.register(DeckColor)
+class DeckColorAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Crew)
+class CrewAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(SideEffect)
+class SideEffectAdmin(admin.ModelAdmin):
+    pass
