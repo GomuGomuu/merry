@@ -27,9 +27,10 @@ def card_list(request: Request) -> Response:
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes((AllowAny,))
-def card_detail(request: Request, card_id: int) -> Response:
-    if card := Card.objects.filter(id=card_id).first():
+def card_detail(request: Request, pk: int) -> Response:
+    if card := Card.objects.filter(id=pk).first():
         card_response = CardSerializer(card)
+        print(card_response.data)
         return Response(card_response.data, status=status.HTTP_200_OK)
     return Response("Card not found", status=status.HTTP_404_NOT_FOUND)
 
@@ -50,8 +51,8 @@ def create_card(request: Request) -> Response:
 @csrf_exempt
 @api_view(("PUT",))
 @permission_classes((IsAuthenticated,))
-def update_card(request: Request, card_id: int) -> Response:
-    if card := Card.objects.filter(id=card_id).first():
+def update_card(request: Request, pk: int) -> Response:
+    if card := Card.objects.filter(id=pk).first():
         card_serializer = CardSerializer(card, data=request.data)
         if card_serializer.is_valid():
             card_serializer.save()
@@ -64,8 +65,8 @@ def update_card(request: Request, card_id: int) -> Response:
 @csrf_exempt
 @api_view(("DELETE",))
 @permission_classes((IsAdminUser,))
-def delete_card(request: Request, card_id: int) -> Response:
-    if card := Card.objects.filter(id=card_id).exists():
+def delete_card(request: Request, pk: int) -> Response:
+    if card := Card.objects.filter(id=pk).exists():
         card.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     return Response("Card not found", status=status.HTTP_404_NOT_FOUND)
@@ -75,8 +76,8 @@ def delete_card(request: Request, card_id: int) -> Response:
 @csrf_exempt
 @api_view(("GET",))
 @permission_classes((AllowAny,))
-def card_illustrations(request: Request, card_id: int) -> Response:
-    if card := Card.objects.filter(id=card_id).first():
+def card_illustrations(request: Request, pk: int) -> Response:
+    if card := Card.objects.filter(id=pk).first():
         serializer = CardIllustrationSerializer(card.illustrations, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response("Card not found", status=status.HTTP_404_NOT_FOUND)
@@ -86,7 +87,7 @@ def card_illustrations(request: Request, card_id: int) -> Response:
 @csrf_exempt
 @api_view(("POST",))
 @permission_classes((IsAuthenticated,))
-def create_card_illustration(request: Request, card_id: int) -> Response:
+def create_card_illustration(request: Request) -> Response:
     serializer = CardSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -99,9 +100,9 @@ def create_card_illustration(request: Request, card_id: int) -> Response:
 @api_view(("GET",))
 @permission_classes((AllowAny,))
 def card_illustration_detail(
-    request: Request, card_id: int, illustration_id: int
+    request: Request, pk: int, illustration_id: int
 ) -> Response:
-    if card := Card.objects.filter(id=card_id).exists():
+    if card := Card.objects.filter(id=pk).exists():
         if illustration := card.illustrations.filter(id=illustration_id).exists():
             serializer = CardIllustrationSerializer(illustration, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)

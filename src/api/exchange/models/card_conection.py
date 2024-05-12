@@ -6,7 +6,9 @@ from api.exchange.models import ExchangeProvider
 
 
 class CardConnection(BaseModel):
-    card_illustration = models.ForeignKey(CardIllustration, on_delete=models.PROTECT)
+    card_illustration = models.ForeignKey(
+        CardIllustration, on_delete=models.PROTECT, related_name="connections"
+    )
     exchange = models.ForeignKey(ExchangeProvider, on_delete=models.CASCADE)
     external_source_link = models.URLField(blank=True, null=True)
 

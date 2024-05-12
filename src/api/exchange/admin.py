@@ -4,7 +4,8 @@ from api.exchange.models.card_conection import CardConnection
 
 
 class ExchangeProviderAdmin(admin.ModelAdmin):
-    fields = ("name", "app_label")
+    list_display = ("name", "as_main")
+    fields = ("name", "app_label", "as_main")
 
 
 admin.site.register(ExchangeProvider, ExchangeProviderAdmin)
@@ -12,7 +13,7 @@ admin.site.register(ExchangeProvider, ExchangeProviderAdmin)
 
 class CardConnectionAdmin(admin.ModelAdmin):
     fields = ("card_illustration", "exchange", "external_source_link")
-    list_display = ("exchange",)
+    list_display = ("card_illustration", "exchange")
     list_filter = ("exchange",)
 
     def get_readonly_fields(self, request, obj=None):
