@@ -1,17 +1,18 @@
 import os
-from pathlib import Path
 from datetime import timedelta
-from os.path import dirname, exists, join
+from os.path import exists
+from pathlib import Path
 
 import environ
 
 # Load operating system env variables and prepare to use them
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 env = environ.Env()
-env_file = join(dirname(__file__), "local.env")
+env_file = BASE_DIR / "config/.env"
+
 if exists(env_file):
     environ.Env.read_env(str(env_file))
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env(

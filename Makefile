@@ -4,31 +4,26 @@ DOCKER_COMPOSE_FILE:=$(ROOT_DIR)/docker-compose.yml
 help: ## Show this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
 
-docker-up:  ## Start all or c=<name> containers in foreground
-	@docker compose -f $(DOCKER_COMPOSE_FILE) up $(c)
+docker-up:
+	@docker compose up
 
 
-docker-down: ## Stop all or c=<name> containers
-	@docker compose -f $(DOCKER_COMPOSE_FILE) down $(c)
+docker-down:
+	@docker compose down
 
 
-docker-restart: ## Restart all or c=<name> containers
-	@docker compose -f $(DOCKER_COMPOSE_FILE) restart $(c)
+docker-restart:
+	@docker compose restart
 
 
-docker-build: ## Build all or c=<name> containers
-	@docker compose -f $(DOCKER_COMPOSE_FILE) build $(c)
+docker-build:
+	@docker compose build
 
-docker-list-services: ## List all services
-	@docker compose -f $(DOCKER_COMPOSE_FILE) config --services
+docker-list-services:
+	@docker compose config --services
 
 docker-join: ## Join to container c=<name>
 	@docker exec -it $(c) bash
-
-resetdatabase:
-	docker exec -it merry-postgres psql -p 5432 -U postgres -d postgres -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO postgres; GRANT ALL ON SCHEMA public TO public;"
-	python src/manage.py migrate
-	python src/manage.py init_base
 
 start: # Up django
 	@docker compose up -d merry-postgres

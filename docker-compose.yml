@@ -1,15 +1,18 @@
 version: "3.12"
+
+x-env_file:
+  env_file: &env_file
+    - .env
+
 services:
   api:
     build: .
     volumes:
-      - ./src:/usr/app
+      - ./src/:/src/
     ports:
       - "8000:8000"
-    networks:
-      - backend
     environment:
-      ENV: development
+      - .env
     healthcheck:
       test: curl -f http://127.0.0.1:8000/health_check/ || exit 1
       interval: 1m30s
@@ -19,25 +22,26 @@ services:
     depends_on:
       merry-postgres:
         condition: service_healthy
+    networks:
+      - backend
 
   merry-postgres:
     container_name: merry-postgres
     image: postgres:14-bullseye
     ports:
       - "5432:5432"
-    networks:
-      - backend
     volumes:
       - ./docker/db/pgdata:/var/lib/postgresql/data
+    env_file: *env_file
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_HOST_AUTH_METHOD: md5
     healthcheck:
       test: "pg_isready -U postgres"
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - backend
 
 networks:
   backend:
