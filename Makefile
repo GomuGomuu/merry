@@ -7,14 +7,11 @@ help: ## Show this help
 docker-up:
 	@docker compose up
 
-
 docker-down:
 	@docker compose down
 
-
 docker-restart:
 	@docker compose restart
-
 
 docker-build:
 	@docker compose build
@@ -25,7 +22,8 @@ docker-list-services:
 docker-join: ## Join to container c=<name>
 	@docker exec -it $(c) bash
 
-start: # Up django
-	@docker compose up -d merry-postgres
-	@timeout 5
-	python src/manage.py runserver 0.0.0.0:8000
+up: # Up django
+	@make docker-up
+
+down: # Down django
+	@make docker-down
