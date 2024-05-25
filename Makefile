@@ -4,12 +4,6 @@ DOCKER_COMPOSE_FILE:=$(ROOT_DIR)/docker-compose.yml
 help: ## Show this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
 
-docker-up:
-	@docker compose up
-
-docker-down:
-	@docker compose down
-
 docker-restart:
 	@docker compose restart
 

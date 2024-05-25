@@ -4,27 +4,43 @@ x-env_file:
   env_file: &env_file
     - .env
 
+x-api-base: &api-base
+  image: api
+  depends_on:
+    merry-postgres:
+      condition: service_healthy
+  env_file: *env_file
+  init: true
+
 services:
   api:
+    <<: *api-base
     build: .
     volumes:
       - ./src/:/src
     ports:
       - "8000:8000"
-    environment:
-      - .env
     healthcheck:
       test: curl -f http://127.0.0.1:8000/health_check/ || exit 1
       interval: 1m30s
       timeout: 10s
       retries: 3
-      start_period: 40s
-    depends_on:
-      merry-postgres:
-        condition: service_healthy
+      start_period: 5s
     networks:
       - backend
     command: "python manage.py runserver 0.0.0.0:8000"
+
+  api-init:
+    <<: *api-base
+    depends_on:
+      - api
+    volumes:
+        - ./src/:/src
+    command: "make resetdb"
+    networks:
+      - backend
+    profiles:
+      - init
 
   merry-postgres:
     container_name: merry-postgres

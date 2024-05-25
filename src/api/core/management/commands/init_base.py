@@ -91,7 +91,7 @@ def creat_card():
 
         illustation1.src.save(
             "2024-05-11-1a5f2043-d9fb-45d3-adaf-79e69b637094-op01-025-par.png",
-            open(f"{BASE_DIR.parent}/initialdata/OP01-025_p1.png", "rb"),
+            open(f"{BASE_DIR}/initialdata/OP01-025_p1.png", "rb"),
         )
 
         illustation2 = CardIllustration.objects.create(
@@ -103,7 +103,7 @@ def creat_card():
 
         illustation2.src.save(
             "2024-05-11-1c089c06-14d0-4df5-81fd-7a4778caa15c-op01-025.png",
-            open(f"{BASE_DIR.parent}/initialdata/OP01-025.png", "rb"),
+            open(f"{BASE_DIR}/initialdata/OP01-025.png", "rb"),
         )
 
 

@@ -25,7 +25,7 @@ ENVIRONMENT = env("ENV")
 # ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]"]
 ALLOWED_HOSTS = ["*"]
 # CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=[])
-CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app"]
+CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app", "https://merry.stahelin.dev"]
 
 # Application definition
 DJANGO_APPS = [
@@ -164,7 +164,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATIC_DIR = os.path.join(BASE_DIR, "../static")
+STATIC_DIR = os.path.join(BASE_DIR, "api/static")
 STATICFILES_DIRS = [STATIC_DIR]
 
 MEDIA_URL = "/media/"
