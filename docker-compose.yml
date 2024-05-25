@@ -8,7 +8,7 @@ services:
   api:
     build: .
     volumes:
-      - ./src/:/src/
+      - ./src/:/src
     ports:
       - "8000:8000"
     environment:
@@ -24,6 +24,7 @@ services:
         condition: service_healthy
     networks:
       - backend
+    command: "python manage.py runserver 0.0.0.0:8000"
 
   merry-postgres:
     container_name: merry-postgres

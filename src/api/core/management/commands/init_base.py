@@ -3,7 +3,8 @@ import logging
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.conf import settings
-from api.core.settings import BASE_DIR
+
+from config.settings import BASE_DIR
 
 logger = logging.getLogger(__name__)
 
