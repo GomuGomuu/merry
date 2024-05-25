@@ -4,10 +4,10 @@ DOCKER_COMPOSE_FILE:=$(ROOT_DIR)/docker-compose.yml
 help: ## Show this help
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
 
-docker-restart:
+restart:
 	@docker compose restart
 
-docker-build:
+build:
 	@docker compose build
 
 docker-list-services:
@@ -17,7 +17,7 @@ docker-join: ## Join to container c=<name>
 	@docker exec -it $(c) bash
 
 up: # Up django
-	@make docker-up
+	@docker compose up
 
 down: # Down django
-	@make docker-down
+	@docker compose down
