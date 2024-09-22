@@ -1,0 +1,61 @@
+client_max_body_size 1024M;
+
+map $http_upgrade $connection_upgrade {
+    "websocket" "Upgrade";
+}
+
+proxy_ssl_server_name on;
+proxy_connect_timeout 300s;
+proxy_send_timeout 300s;
+proxy_read_timeout 300s;
+
+resolver 127.0.0.11 valid=30s;
+
+server {
+    listen 80;
+    server_name ${LOCAL_DOMAIN};
+
+    return 301 https://$host$request_uri;
+}
+
+server {
+    server_name ${LOCAL_DOMAIN};
+
+    listen 443 ssl;
+    ssl_certificate /etc/nginx/cert.pem;
+    ssl_certificate_key /etc/nginx/privkey.pem;
+
+    proxy_http_version 1.1;
+    proxy_set_header Host $http_host;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    location / {
+        proxy_pass http://api:8000;
+    }
+}
+
+# Bloco do Flower (se necessário)
+# server {
+#     server_name flower.${LOCAL_DOMAIN};
+#
+#     listen 80;
+#     listen 443 ssl;
+#     ssl_certificate /etc/nginx/cert.pem;
+#     ssl_certificate_key /etc/nginx/privkey.pem;
+#
+#     proxy_http_version 1.1;
+#     proxy_set_header Host $http_host;
+#     proxy_set_header Upgrade $http_upgrade;
+#     proxy_set_header Connection $connection_upgrade;
+#     proxy_set_header X-Real-IP $remote_addr;
+#     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#     proxy_set_header X-Forwarded-Proto $scheme;
+#
+#     location / {
+#         proxy_pass http://flower:5555;
+#     }
+# }
