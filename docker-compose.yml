@@ -9,6 +9,8 @@ x-api-base: &api-base
   depends_on:
     merry-postgres:
       condition: service_healthy
+    redis:
+      condition: service_healthy
   env_file: *env_file
   init: true
 
@@ -37,8 +39,6 @@ services:
     volumes:
         - ./src/:/src
     command: "make resetdb"
-    networks:
-      - backend
     profiles:
       - init
 
@@ -60,6 +60,40 @@ services:
     networks:
       - backend
 
+  redis:
+    image: redis:6-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  celery:
+    <<: *api-base
+    depends_on:
+      - api
+      - redis
+    volumes:
+      - ./src/:/src
+    environment:
+      PYTHONPATH: /src
+    command: "celery -A config.celery worker --loglevel=info"
+
+#  nginx:
+#    build:
+#      context: .
+#      dockerfile: ./docker/nginx/Dockerfile
+#      args:
+#        NGINX_HOST_PORT: ${NGINX_HOST_PORT}
+#        LOCAL_DOMAIN: ${LOCAL_DOMAIN}
+#    env_file: *env_file
+#    depends_on:
+#      - api
+#    ports:
+#      - '${NGINX_HOST_PORT}:443'
 networks:
   backend:
 
