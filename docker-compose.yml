@@ -37,10 +37,12 @@ services:
     depends_on:
       - api
     volumes:
-        - ./src/:/src
+      - ./src/:/src
     command: "make resetdb"
     profiles:
       - init
+    networks:
+      - backend
 
   merry-postgres:
     container_name: merry-postgres
@@ -70,6 +72,8 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
+    networks:
+        - backend
 
   celery:
     <<: *api-base
@@ -80,7 +84,9 @@ services:
       - ./src/:/src
     environment:
       PYTHONPATH: /src
-    command: "celery -A config.celery worker --loglevel=info"
+    command: "celery -A config.celery:app worker --loglevel=info"
+    networks:
+      - backend
 
 #  nginx:
 #    build:
@@ -92,8 +98,26 @@ services:
 #    env_file: *env_file
 #    depends_on:
 #      - api
+#      - flower
 #    ports:
 #      - '${NGINX_HOST_PORT}:443'
+#    networks:
+#      - backend
+
+  flower:
+    <<: *api-base
+    ports:
+      - "5555:5555"
+    depends_on:
+      - api
+      - redis
+      - celery
+    environment:
+      PYTHONPATH: /src
+    command: "celery -A config.celery:app flower --address='0.0.0.0'"
+    networks:
+      - backend
+
 networks:
   backend:
 
