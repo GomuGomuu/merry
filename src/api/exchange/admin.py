@@ -1,16 +1,15 @@
 from django.contrib import admin
-from api.exchange.models import ExchangeProvider
+from api.exchange.models import ExchangeProvider, ProviderWorker
 from api.exchange.models.card_conection import CardConnection
 
 
+@admin.register(ExchangeProvider)
 class ExchangeProviderAdmin(admin.ModelAdmin):
     list_display = ("name", "as_main")
     fields = ("name", "app_label", "as_main")
 
 
-admin.site.register(ExchangeProvider, ExchangeProviderAdmin)
-
-
+@admin.register(CardConnection)
 class CardConnectionAdmin(admin.ModelAdmin):
     fields = ("card_illustration", "exchange", "external_source_link")
     list_display = ("card_illustration", "exchange")
@@ -23,4 +22,8 @@ class CardConnectionAdmin(admin.ModelAdmin):
             return []
 
 
-admin.site.register(CardConnection, CardConnectionAdmin)
+@admin.register(ProviderWorker)
+class ProviderWorkerAdmin(admin.ModelAdmin):
+    list_display = ("provider", "url")
+    fields = ("provider", "url")
+    list_filter = ("provider",)

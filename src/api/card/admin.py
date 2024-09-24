@@ -1,7 +1,7 @@
 import uuid
 from datetime import date
 
-from api.card.models import CardIllustration, Card, Op, DeckColor, Crew
+from api.card.models import CardIllustration, Card, Op, DeckColor, Crew, Price
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django import forms
@@ -63,12 +63,10 @@ class CardIllustrationInline(admin.TabularInline):
         )
 
 
+@admin.register(CardIllustration)
 class CardIllustrationAdmin(admin.ModelAdmin):
     list_display = ["card", "art_type", "is_alternative_art"]
     search_fields = ["card", "art_type", "is_alternative_art"]
-
-
-admin.site.register(CardIllustration, CardIllustrationAdmin)
 
 
 class CardForm(forms.ModelForm):
@@ -88,6 +86,7 @@ class CardForm(forms.ModelForm):
         return instance
 
 
+@admin.register(Card)
 class CardAdmin(admin.ModelAdmin):
     list_display = ["name", "crews", "colors", "op", "is_dom", "type"]
     inlines = [CardIllustrationInline]
@@ -109,9 +108,6 @@ class CardAdmin(admin.ModelAdmin):
     colors.short_description = "Colors"
 
 
-admin.site.register(Card, CardAdmin)
-
-
 @admin.register(Op)
 class OpAdmin(admin.ModelAdmin):
     pass
@@ -129,4 +125,9 @@ class CrewAdmin(admin.ModelAdmin):
 
 @admin.register(SideEffect)
 class SideEffectAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Price)
+class PriceAdmin(admin.ModelAdmin):
     pass

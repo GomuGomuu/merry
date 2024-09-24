@@ -4,3 +4,6 @@ class ProviderServiceInterface:
 
     def get_price_history(self, *args, **kwargs):
         raise NotImplementedError
+
+    def get_price(self, *args, **kwargs):
+        raise NotImplementedError
