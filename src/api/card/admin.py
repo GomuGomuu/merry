@@ -68,6 +68,22 @@ class CardIllustrationAdmin(admin.ModelAdmin):
     list_display = ["card", "art_type", "is_alternative_art"]
     search_fields = ["card", "art_type", "is_alternative_art"]
 
+    actions = ["update_price"]
+
+    def update_price(self, request, queryset):
+        from api.card.services.update_price import update_card_price
+
+        for illustration in queryset:
+            try:
+                illustration_price = update_card_price(illustration)
+                self.message_user(
+                    request,
+                    f"Price for {illustration} updated to {illustration_price}",
+                    level="SUCCESS",
+                )
+            except Exception as e:
+                raise e
+
 
 class CardForm(forms.ModelForm):
     class Meta:
@@ -130,4 +146,5 @@ class SideEffectAdmin(admin.ModelAdmin):
 
 @admin.register(Price)
 class PriceAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["price", "date", "card_illustration"]
+    readonly_fields = ["date", "card_illustration", "price"]

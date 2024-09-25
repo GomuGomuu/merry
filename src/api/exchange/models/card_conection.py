@@ -24,3 +24,8 @@ class CardConnection(BaseModel):
     @property
     def name(self):
         return self.__str__()
+
+    def get_price(self):
+        return self.exchange.get_illustration_price(
+            self.card_illustration, source_url=self.external_source_link
+        )

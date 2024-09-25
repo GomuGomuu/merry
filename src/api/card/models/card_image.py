@@ -26,6 +26,5 @@ class CardIllustration(AbstractImage):
             text += " (Alternative Art)"
         return text
 
-    @property
     def name(self):
-        return self.__str__
+        return f"{self.card} - {self.code} - {self.art_type}"

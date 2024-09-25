@@ -14,3 +14,11 @@ class ExchangeProvider(AbstractProvider):
     @property
     def service(self):
         return (self.module.service.ProviderService or ProviderServiceInterface)(self)
+
+    def get_illustration_price(self, illustration, source_url=None):
+        worker_url = self.worker.first().url
+        return self.service.get_price(
+            source_url=source_url,
+            illustration_name=illustration.name(),
+            worker_url=worker_url,
+        )
