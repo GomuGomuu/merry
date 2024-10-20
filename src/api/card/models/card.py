@@ -1,5 +1,6 @@
 from django.db import models
 
+from api.core.models import AbstractImage
 from api.core.models.base_model import BaseModel
 from api.core.utils import slugify
 
@@ -26,6 +27,10 @@ class Crew(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
 
 class SideEffect(models.Model):
     name = models.CharField(max_length=100)
@@ -33,6 +38,23 @@ class SideEffect(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+class Atribute(AbstractImage):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, unique=True)
+    logo = models.ImageField(upload_to="atributes")
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
 
 class Card(BaseModel):
@@ -43,6 +65,8 @@ class Card(BaseModel):
     SUPER_RARE = "SR"
     SECRET_RARE = "SCR"
     LEADER = "L"
+    SPECIAL_CARD = "SP CARD"
+    SEC = "SEC"
     RARE_CHOICES = [
         (COMMON, "Common"),
         (UNCOMMON, "Uncommon"),
@@ -50,6 +74,8 @@ class Card(BaseModel):
         (SUPER_RARE, "Super Rare"),
         (SECRET_RARE, "Secret Rare"),
         (LEADER, "Leader"),
+        (SPECIAL_CARD, "Special Card"),
+        (SEC, "SEC"),
     ]
 
     TYPE_CHOICES = [
@@ -70,15 +96,21 @@ class Card(BaseModel):
     type = models.CharField(max_length=100, choices=TYPE_CHOICES)
     op = models.ForeignKey(Op, on_delete=models.PROTECT)
     deck_color = models.ManyToManyField(DeckColor, related_name="deck_colors")
-    rare = models.CharField(max_length=3, choices=RARE_CHOICES)
-    trigger = models.CharField(max_length=100, blank=True)
+    rare = models.CharField(max_length=7, choices=RARE_CHOICES)
+    trigger = models.CharField(max_length=100, null=True, blank=True)
     side_effects = models.ManyToManyField(SideEffect, related_name="side_effects")
+    attribute = models.ForeignKey(
+        Atribute,
+        on_delete=models.PROTECT,
+        related_name="atributes",
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
     def crew_str(self):

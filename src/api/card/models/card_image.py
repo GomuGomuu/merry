@@ -16,6 +16,7 @@ class CardIllustration(AbstractImage):
     art_type = models.CharField(max_length=100, choices=types)
     is_alternative_art = models.BooleanField(default=False)
     code = models.CharField(max_length=100)
+    external_link = models.URLField(null=True, blank=True)
 
     class Meta:
         unique_together = ("card", "code")

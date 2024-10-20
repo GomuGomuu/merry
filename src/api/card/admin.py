@@ -1,5 +1,8 @@
+import logging
 import uuid
 from datetime import date
+
+from django.db.models import Count
 
 from api.card.models import CardIllustration, Card, Op, DeckColor, Crew, Price
 from django.contrib import admin
@@ -7,7 +10,14 @@ from django.utils.safestring import mark_safe
 from django import forms
 
 from api.card.models.card import SideEffect
+from api.card.services.import_card import (
+    import_card,
+    import_card_illustrations,
+    update_illustration_type,
+)
 from api.core.utils import slugify
+
+logger = logging.getLogger(__name__)
 
 
 class CardIllustrationForm(forms.ModelForm):
@@ -65,10 +75,22 @@ class CardIllustrationInline(admin.TabularInline):
 
 @admin.register(CardIllustration)
 class CardIllustrationAdmin(admin.ModelAdmin):
-    list_display = ["card", "art_type", "is_alternative_art"]
+    list_display = ["thumbnail", "card", "art_type", "is_alternative_art"]
     search_fields = ["card", "art_type", "is_alternative_art"]
+    list_filter = ["art_type", "is_alternative_art"]
 
-    actions = ["update_price"]
+    actions = ["update_price", "update_illustration_type_action"]
+
+    def thumbnail(self, obj):
+        if obj.src:
+            return mark_safe(
+                '<img src="{}" style="max-height: 100px; max-width: 100px;" />'.format(
+                    obj.src.url
+                )
+            )
+        return "-"
+
+    thumbnail.short_description = "Thumbnail"
 
     def update_price(self, request, queryset):
         from api.card.services.update_price import update_card_price
@@ -83,6 +105,13 @@ class CardIllustrationAdmin(admin.ModelAdmin):
                 )
             except Exception as e:
                 raise e
+
+    update_price.short_description = "Update Price"
+
+    def update_illustration_type_action(self, request, queryset):
+        update_illustration_type()
+
+    update_illustration_type_action.short_description = "Update Illustration Type"
 
 
 class CardForm(forms.ModelForm):
@@ -104,14 +133,29 @@ class CardForm(forms.ModelForm):
 
 @admin.register(Card)
 class CardAdmin(admin.ModelAdmin):
-    list_display = ["name", "crews", "colors", "op", "is_dom", "type"]
+    list_display = [
+        "name",
+        "crews",
+        "colors",
+        "op",
+        "is_dom",
+        "type",
+        "illustrations_count",
+    ]
     inlines = [CardIllustrationInline]
-    search_fields = ["name", "description"]
+    search_fields = ["name"]
     list_filter = ["op", "is_dom", "deck_color", "type"]
 
     readonly_fields = ("slug",)
 
     form = CardForm
+    actions = ["import_cards_action", "import_cards_illustrations_action"]
+
+    def import_cards_action(self, request, queryset):
+        import_card()
+
+    def import_cards_illustrations_action(self, request, queryset):
+        import_card_illustrations()
 
     def crews(self, obj):
         return "/".join([crew.name for crew in obj.crew.all()])
@@ -122,6 +166,20 @@ class CardAdmin(admin.ModelAdmin):
         return "/".join([color.name for color in obj.deck_color.all()])
 
     colors.short_description = "Colors"
+
+    # Adicione o campo que calcula a contagem de ilustrações
+    def illustrations_count(self, obj):
+        return obj.illustrations_count
+
+    illustrations_count.short_description = "Number of Illustrations"
+    illustrations_count.admin_order_field = (
+        "illustrations_count"  # Permite ordenar por essa coluna
+    )
+
+    # Modifique o queryset para incluir a contagem de ilustrações
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(illustrations_count=Count("illustrations"))
 
 
 @admin.register(Op)
