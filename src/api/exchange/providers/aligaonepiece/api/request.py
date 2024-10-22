@@ -22,7 +22,7 @@ def request(
     request_url = _make_request_url(
         endpoint=endpoint, base_url=url, endpoint_params=endpoint_params
     )
-    
+
     try:
         response = requests.post(
             url=request_url,

@@ -25,7 +25,7 @@ urlpatterns = [
     path("", views.card_list, name="card_list"),
     path("create/", views.create_card, name="create_card"),
     path(
-        "<int:pk>/",
+        "<str:slug>/",
         include(card_urls),
     ),
     path("illustrations/", views.illustration_list, name="illustration_list"),

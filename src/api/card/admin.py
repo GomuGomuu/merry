@@ -2,6 +2,7 @@ import logging
 import uuid
 from datetime import date
 
+from django.contrib.admin import SimpleListFilter
 from django.db.models import Count
 
 from api.card.models import CardIllustration, Card, Op, DeckColor, Crew, Price
@@ -10,11 +11,12 @@ from django.utils.safestring import mark_safe
 from django import forms
 
 from api.card.models.card import SideEffect
+from api.card.services.exporter import generate_data_cards_for_gemini
 from api.card.services.import_card import (
     import_card,
     import_card_illustrations,
-    update_illustration_type,
 )
+from api.card.services.update_card import update_illustration_type
 from api.core.utils import slugify
 
 logger = logging.getLogger(__name__)
@@ -73,13 +75,35 @@ class CardIllustrationInline(admin.TabularInline):
         )
 
 
+class HasThumbnailFilter(SimpleListFilter):
+    title = 'Has Thumbnail'
+    parameter_name = 'has_thumbnail'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Yes'),
+            ('no', 'No'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            return queryset.filter(src__contains='-')
+        if self.value() == 'no':
+            return queryset.exclude(src__contains='-')
+        return queryset
+
+
 @admin.register(CardIllustration)
 class CardIllustrationAdmin(admin.ModelAdmin):
-    list_display = ["thumbnail", "card", "art_type", "is_alternative_art"]
-    search_fields = ["card", "art_type", "is_alternative_art"]
-    list_filter = ["art_type", "is_alternative_art"]
+    list_display = ["thumbnail", "code" ,"card", "art_type", "is_alternative_art"]
+    search_fields = ["code", "card__name"]
+    list_filter = ["art_type", "is_alternative_art", HasThumbnailFilter]
 
-    actions = ["update_price", "update_illustration_type_action"]
+    actions = [
+        "update_price",
+        "update_illustration_type_action",
+        "export_as_json_for_gemini",
+    ]
 
     def thumbnail(self, obj):
         if obj.src:
@@ -112,6 +136,11 @@ class CardIllustrationAdmin(admin.ModelAdmin):
         update_illustration_type()
 
     update_illustration_type_action.short_description = "Update Illustration Type"
+
+    def export_as_json_for_gemini(self, request, queryset):
+        generate_data_cards_for_gemini()
+
+    export_as_json_for_gemini.short_description = "Export as JSON for Gemini"
 
 
 class CardForm(forms.ModelForm):
@@ -149,13 +178,28 @@ class CardAdmin(admin.ModelAdmin):
     readonly_fields = ("slug",)
 
     form = CardForm
-    actions = ["import_cards_action", "import_cards_illustrations_action"]
+    actions = [
+        "import_cards_action",
+        "import_cards_illustrations_action",
+        "update_card_effects_action",
+    ]
 
     def import_cards_action(self, request, queryset):
         import_card()
 
+    import_cards_action.short_description = "Import Cards"
+
     def import_cards_illustrations_action(self, request, queryset):
         import_card_illustrations()
+
+    import_cards_illustrations_action.short_description = "Import Cards Illustrations"
+
+    def update_card_effects_action(self, request, queryset):
+        from api.card.services.update_card import update_card_effects
+
+        update_card_effects()
+
+    update_card_effects_action.short_description = "Update Card Effects"
 
     def crews(self, obj):
         return "/".join([crew.name for crew in obj.crew.all()])

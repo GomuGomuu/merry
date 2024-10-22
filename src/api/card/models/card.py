@@ -9,6 +9,9 @@ class Op(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
 
+    def to_json(self):
+        return {"name": self.name, "slug": self.slug}
+
     def __str__(self):
         return self.name
 
@@ -19,6 +22,9 @@ class DeckColor(models.Model):
     def __str__(self):
         return self.name
 
+    def to_json(self):
+        return {"name": self.name}
+
 
 class Crew(models.Model):
     name = models.CharField(max_length=100)
@@ -26,6 +32,9 @@ class Crew(models.Model):
 
     def __str__(self):
         return self.name
+
+    def to_json(self):
+        return {"name": self.name}
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -35,6 +44,9 @@ class Crew(models.Model):
 class SideEffect(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
+
+    def to_json(self):
+        return {"name": self.name, "slug": self.slug}
 
     def __str__(self):
         return self.name
@@ -55,6 +67,13 @@ class Atribute(AbstractImage):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "slug": self.slug,
+            "logo_url": self.logo.url,
+        }
 
 
 class Card(BaseModel):
@@ -112,6 +131,29 @@ class Card(BaseModel):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "slug": self.slug,
+            "is_dom": self.is_dom,
+            "cost": self.cost,
+            "power": self.power,
+            "counter_value": self.counter_value,
+            "crew": [crew.to_json() for crew in self.crew.all()],
+            "effect": self.effect,
+            "type": self.type,
+            "op": self.op.to_json(),
+            "deck_color": [
+                deck_color.to_json() for deck_color in self.deck_color.all()
+            ],
+            "rare": self.rare,
+            "trigger": self.trigger,
+            "side_effects": [
+                side_effect.to_json() for side_effect in self.side_effects.all()
+            ],
+            "attribute": self.attribute.to_json() if self.attribute else None,
+        }
 
     def crew_str(self):
         return "/".join([crew.name for crew in self.crew.all()])
