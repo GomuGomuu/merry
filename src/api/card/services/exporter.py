@@ -5,15 +5,22 @@ from api.card.models import Card
 
 def generate_data_cards_for_gemini():
     all_cards = Card.objects.all()
-    base_url = "http://172.24.160.1:8000"
+    base_url = "http://10.0.0.128:8000"
     cards = []
     for card in all_cards:
-        data = {"api_url": f"{base_url}/cards/{card.slug}/", "name": card.name}
+        data = {
+            "api_url": f"{base_url}/cards/{card.slug}/",
+            "name": card.name,
+            "illustrations": [
+                {
+                    "code": illustration.code,
+                    "src": f"{base_url}/media/{illustration.src}",
+                    "external_link": illustration.external_link,
+                }
+                for illustration in card.illustrations.all()
+            ],
+        }
         data.update(card.to_json())
-
-        data["illustrations"] = [
-            illustration.to_json() for illustration in card.illustrations.all()
-        ]
 
         cards.append(data)
 
@@ -44,6 +51,8 @@ def generate_tensorflow_dataset():
                     f.write(image_file.read())
 
             except Exception as e:
-                print(f"Error on card {card.slug} illustration {illustration.code}: {e}")
+                print(
+                    f"Error on card {card.slug} illustration {illustration.code}: {e}"
+                )
 
     print("Dataset generated")

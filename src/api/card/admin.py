@@ -76,26 +76,26 @@ class CardIllustrationInline(admin.TabularInline):
 
 
 class HasThumbnailFilter(SimpleListFilter):
-    title = 'Has Thumbnail'
-    parameter_name = 'has_thumbnail'
+    title = "Has Thumbnail"
+    parameter_name = "has_thumbnail"
 
     def lookups(self, request, model_admin):
         return (
-            ('yes', 'Yes'),
-            ('no', 'No'),
+            ("yes", "Yes"),
+            ("no", "No"),
         )
 
     def queryset(self, request, queryset):
-        if self.value() == 'yes':
-            return queryset.filter(src__contains='-')
-        if self.value() == 'no':
-            return queryset.exclude(src__contains='-')
+        if self.value() == "yes":
+            return queryset.filter(src__contains="-")
+        if self.value() == "no":
+            return queryset.exclude(src__contains="-")
         return queryset
 
 
 @admin.register(CardIllustration)
 class CardIllustrationAdmin(admin.ModelAdmin):
-    list_display = ["thumbnail", "code" ,"card", "art_type", "is_alternative_art"]
+    list_display = ["thumbnail", "code", "card", "art_type", "is_alternative_art"]
     search_fields = ["code", "card__name"]
     list_filter = ["art_type", "is_alternative_art", HasThumbnailFilter]
 
