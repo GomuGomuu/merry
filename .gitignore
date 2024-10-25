@@ -96,3 +96,5 @@ static/
 /.obsidian/
 /src/api/media/img/*
 src/media/
+
+src/config/.env

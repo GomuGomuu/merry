@@ -178,5 +178,6 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 CELERY_BROKER_URL = "redis://redis:6379/0"
+
+GEMINI_API_URL = env("GEMINI_API_URL")
