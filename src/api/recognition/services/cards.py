@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 class CardMatcher:
     def __init__(
         self,
-        model_name="paraphrase-MiniLM-L6-v2",
-        embedded_cards_file_path=f"{BASE_DIR}/api/recognition/embeddings/cards.json",
+        model_name: str = "paraphrase-MiniLM-L6-v2",
+        embedded_cards_file_path: str = f"{BASE_DIR}/api/recognition/embeddings/cards.json",
     ):
         self.model = SentenceTransformer(model_name)
         self.embedded_cards_file_path = embedded_cards_file_path
