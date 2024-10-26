@@ -1,4 +1,5 @@
 from api.card.models.card import Card
+from api.card.schemas.illustration import IllustrationVisualDescription
 from api.core.models.image import AbstractImage
 from django.db import models
 
@@ -17,6 +18,7 @@ class CardIllustration(AbstractImage):
     is_alternative_art = models.BooleanField(default=False)
     code = models.CharField(max_length=100, unique=True)
     external_link = models.URLField(null=True, blank=True)
+    visual_description = models.JSONField(null=True, blank=True)
 
     class Meta:
         unique_together = ("card", "code")
@@ -38,3 +40,13 @@ class CardIllustration(AbstractImage):
             "external_link": self.external_link,
             "image": str(self.src),
         }
+
+    def get_visual_description(self):
+        return IllustrationVisualDescription(self.visual_description)
+
+    def set_visual_description(
+        self, visual_description: IllustrationVisualDescription, save=True
+    ):
+        self.visual_description = visual_description.to_dict()
+        if save:
+            self.save(update_fields=["visual_description"])

@@ -14,15 +14,15 @@ from ..card.models import Card
 from ..card.serializers.card import CardSerializerList
 from ..core.utils import save_image_to_disk, delete_image_from_disk
 
-gemini = GeminiService()
-card_matcher = CardMatcher()
-
 
 @csrf_exempt
 @api_view(("POST",))
 @extend_schema(**card_recognition_docs)
 @permission_classes((AllowAny,))
 def card_recognition(request):
+    gemini = GeminiService()
+    card_matcher = CardMatcher()
+
     serializer = ImageCardSerializer(data=request.data)
     if serializer.is_valid():
         image = serializer.validated_data["image"]
