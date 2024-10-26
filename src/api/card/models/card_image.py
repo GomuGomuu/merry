@@ -47,6 +47,6 @@ class CardIllustration(AbstractImage):
     def set_visual_description(
         self, visual_description: IllustrationVisualDescription, save=True
     ):
-        self.visual_description = visual_description.to_dict()
+        self.visual_description = visual_description.to_dict()["data"]
         if save:
             self.save(update_fields=["visual_description"])

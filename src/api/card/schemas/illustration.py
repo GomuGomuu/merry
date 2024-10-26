@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass
 
 
@@ -34,3 +35,6 @@ class IllustrationVisualDescription:
         return {
             "data": self.data,
         }
+
+    def to_json(self):
+        return json.dumps(self.data)
