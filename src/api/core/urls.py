@@ -8,6 +8,7 @@ from django.conf import settings
 
 urlpatterns = [
     path("health_check/", views.health_check, name="health_check"),
+    path("ping/", views.ping, name="ping"),
     path("admin/", admin.site.urls),
     path("auth/", include(authentication_urls)),
     path("docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
