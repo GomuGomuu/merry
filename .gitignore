@@ -98,3 +98,6 @@ static/
 src/media/
 
 src/config/.env
+/src/api/recognition/embeddings/card_data.json
+/src/api/recognition/embeddings/embedded_cards.json
+/src/media/tmp

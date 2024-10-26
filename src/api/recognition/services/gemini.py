@@ -15,17 +15,19 @@ class CardResponseFormat(typing.TypedDict):
     counter: int
     type: str
     name: str
-    tribe: str
+    crew: str
     description: str
     trigger: str
 
 
 class GeminiService:
     def __init__(self):
-        self.api_key = settings.GEMINI_API_URL
+        genai.configure(api_key=settings.GEMINI_API_URL)
 
     @classmethod
-    def get_card_text_from_image(cls, image_path: str):
+    def get_card_text_from_image(
+        cls, image_path: str
+    ) -> typing.Optional[CardResponseFormat]:
         try:
             logger.info(f"Uploading image: {image_path} to Gemini")
             card_file = genai.upload_file(image_path)
