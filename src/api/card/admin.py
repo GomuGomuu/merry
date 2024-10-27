@@ -4,6 +4,7 @@ from datetime import date
 
 from django.contrib.admin import SimpleListFilter
 from django.db.models import Count
+from django.urls import reverse
 
 from api.card.models import CardIllustration, Card, Op, DeckColor, Crew, Price
 from django.contrib import admin
@@ -46,8 +47,10 @@ class CardIllustrationInline(admin.TabularInline):
 
     def image_preview(self, obj):
         if obj.src:
+            url = reverse('admin:card_cardillustration_change', args=[obj.pk])
             return mark_safe(
-                '<img src="{}" style="max-height: 100px; max-width: 100px;" />'.format(
+                '<a href="{}"><img src="{}" style="max-height: 100px; max-width: 100px;" /></a>'.format(
+                    url,
                     obj.src.url
                 )
             )
@@ -98,6 +101,19 @@ class CardIllustrationAdmin(admin.ModelAdmin):
     list_display = ["thumbnail", "code", "card", "art_type", "is_alternative_art"]
     search_fields = ["code", "card__name"]
     list_filter = ["art_type", "is_alternative_art", HasThumbnailFilter]
+    fields = [
+        "code",
+        "thumbnail",
+
+        "src",
+        "art_type",
+        "is_alternative_art",
+        "card",
+        "external_link",
+        "visual_description",
+    ]
+
+    readonly_fields = ("code", "thumbnail")
 
     actions = [
         "update_price",
@@ -108,7 +124,7 @@ class CardIllustrationAdmin(admin.ModelAdmin):
     def thumbnail(self, obj):
         if obj.src:
             return mark_safe(
-                '<img src="{}" style="max-height: 100px; max-width: 100px;" />'.format(
+                '<img src="{}" style="max-height: 200px; max-width: 200px;" />'.format(
                     obj.src.url
                 )
             )
@@ -172,7 +188,7 @@ class CardAdmin(admin.ModelAdmin):
         "illustrations_count",
     ]
     inlines = [CardIllustrationInline]
-    search_fields = ["name"]
+    search_fields = ["name", "slug"]
     list_filter = ["op", "is_dom", "deck_color", "type"]
 
     readonly_fields = ("slug",)

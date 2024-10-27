@@ -9,12 +9,12 @@ class CardSerializer(serializers.ModelSerializer):
         fields = "__all__"
         depth = 1
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation["illustrations"] = CardIllustrationSerializer(
-            instance.illustrations, many=True
-        ).data
-        return representation
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     representation["illustrations"] = CardIllustrationSerializer(
+    #         instance.illustrations, many=True
+    #     ).data
+    #     return representation
 
 
 class CardSerializerList(serializers.ModelSerializer):
