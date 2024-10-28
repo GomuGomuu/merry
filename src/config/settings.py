@@ -132,6 +132,45 @@ if env("ENABLE_SENTRY"):
         integrations=[DjangoIntegration()],
     )
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "logs/debug.log"),
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "": {  # Root logger
+            "handlers": ["console", "file"],
+            "level": "DEBUG",
+        },
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
@@ -180,4 +219,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CELERY_BROKER_URL = "redis://redis:6379/0"
 
-GEMINI_API_URL = env("GEMINI_API_URL")
+GEMINI_API_KEY = env("GEMINI_API_KEY")
