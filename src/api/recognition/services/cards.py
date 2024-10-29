@@ -75,7 +75,9 @@ class CardMatcher:
         return self.model.encode(extracted_text)
 
     def _extrac_visual_description_embedding(self, extracted_data):
-        data = extracted_data["layout_description"]
+        data = extracted_data.get("layout_description")
+        if data is None:
+            return self.model.encode("Default visual description")
         texts = [
             data.get("background_color"),
             data.get("border_color"),

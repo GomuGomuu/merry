@@ -1,3 +1,5 @@
+import time
+
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -55,7 +57,9 @@ def card_recognition(request):
             "type": "Character",
         }
         """
+        start_gemini = time.time()
         gemini_response = gemini.get_card_text_from_image(image_path)
+        print(f"Time to get text from image: {time.time() - start_gemini}")
         print(gemini_response)
 
         if gemini_response:
