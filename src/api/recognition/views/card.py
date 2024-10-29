@@ -68,10 +68,12 @@ def card_recognition(request):
             for card in card_matcher_response:
                 card["data"] = CardSerializer(cards.get(slug=card["slug"])).data
                 for illustration in card["illustrations"]:
+                    card_illustration = CardIllustration.objects.get(code=illustration["code"])
                     illustration["data"] = CardIllustrationSerializer(
-                        CardIllustration.objects.get(code=illustration["code"])
+                        card_illustration
                     ).data
-
+                    if price := card_illustration.prices.last():
+                        illustration["data"]["price"] = price.price
             return Response(card_matcher_response, status=status.HTTP_200_OK)
 
         else:

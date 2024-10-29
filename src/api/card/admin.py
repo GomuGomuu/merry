@@ -47,11 +47,10 @@ class CardIllustrationInline(admin.TabularInline):
 
     def image_preview(self, obj):
         if obj.src:
-            url = reverse('admin:card_cardillustration_change', args=[obj.pk])
+            url = reverse("admin:card_cardillustration_change", args=[obj.pk])
             return mark_safe(
                 '<a href="{}"><img src="{}" style="max-height: 100px; max-width: 100px;" /></a>'.format(
-                    url,
-                    obj.src.url
+                    url, obj.src.url
                 )
             )
         return "-"
@@ -104,7 +103,6 @@ class CardIllustrationAdmin(admin.ModelAdmin):
     fields = [
         "code",
         "thumbnail",
-
         "src",
         "art_type",
         "is_alternative_art",
@@ -266,3 +264,5 @@ class SideEffectAdmin(admin.ModelAdmin):
 class PriceAdmin(admin.ModelAdmin):
     list_display = ["price", "date", "card_illustration"]
     readonly_fields = ["date", "card_illustration", "price"]
+    search_fields = ["card_illustration__code"]
+    list_filter = ["date", "card_illustration__card__op__name"]
