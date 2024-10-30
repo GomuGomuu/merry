@@ -7,7 +7,7 @@ Ahoy, nakama! 👋 Welcome to Merry, your friendly companion for navigating the 
 Merry is a Django-powered project designed to streamline and enhance your One Piece Card Game experience. It provides features like:
 
 - **Card Database:** Explore a comprehensive database of One Piece cards, complete with details, images, and pricing information.
-- **Card Recognition:** Identify cards from images using Google's Gemini AI. 
+- **Card Recognition:** A strategy that combines Machine Learning with Google’s Gemini AI is used to identify cards from images.
 - **Deck Building:** (Coming Soon! 🚧) Craft powerful decks and strategize your next conquest.
 - **Price Tracking:** Stay updated on the latest card prices from various vendors.
 - **Community Features:** (Coming Soon! 🚧) Connect with fellow One Piece enthusiasts, share decks, and discuss strategies.
