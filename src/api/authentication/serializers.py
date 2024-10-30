@@ -4,16 +4,15 @@ from rest_framework import serializers
 User = get_user_model()
 
 
-# noinspection PyAbstractClass
 class SignupSerializer(serializers.Serializer):
-    Username = serializers.CharField()
-    Password = serializers.CharField()
-    Name = serializers.CharField()
+    username = serializers.CharField()
+    password = serializers.CharField()
+    name = serializers.CharField()
 
     def validate(self, attrs):
-        username = attrs.get("Username")
-        password = attrs.get("Password")
-        name = attrs.get("Name")
+        username = attrs.get("username")
+        password = attrs.get("password")
+        name = attrs.get("name")
         if username and password and name:
             return {
                 "username": username,
@@ -29,14 +28,13 @@ class SignupSerializer(serializers.Serializer):
         return User.objects.create_user(**validated_data)
 
 
-# noinspection PyAbstractClass
 class SigninSerializer(serializers.Serializer):
-    Username = serializers.CharField()
-    Password = serializers.CharField()
+    username = serializers.CharField()
+    password = serializers.CharField()
 
     def validate(self, attrs):
-        username = attrs.get("Username")
-        password = attrs.get("Password")
+        username = attrs.get("username")
+        password = attrs.get("password")
         if username and password:
             return {
                 "username": username,

@@ -27,6 +27,8 @@ ALLOWED_HOSTS = ["*"]
 # CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=[])
 CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app", "https://merry.stahelin.dev"]
 
+APPEND_SLASH = False
+
 # Application definition
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -60,17 +62,21 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "api.authentication.services.authentication.SafeJWTAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
 }
 
-JWT = {
-    "JWT_SECRET_KEY": env.str("JWT_SECRET_KEY", default=""),
-    "REFRESH_TOKEN_SECRET": env.str("REFRESH_TOKEN_SECRET", default=""),
-    "REFRESH_TOKEN_EXPIRATION": timedelta(days=1),
-    "ACCESS_TOKEN_EXPIRATION": timedelta(minutes=5),
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": env.str("ACCESS_TOKEN_SECRET", default=""),
+    "VERIFYING_KEY": env.str("REFRESH_TOKEN_SECRET", default=""),
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 ROOT_URLCONF = "api.core.urls"

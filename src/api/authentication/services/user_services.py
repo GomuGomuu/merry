@@ -1,8 +1,8 @@
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
 from api.authentication.models import User
-from api.authentication.utils.token import generate_access_token, generate_refresh_token
 from api.core.services.base import BaseService
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class GetAllUsers(BaseService):
@@ -24,8 +24,14 @@ class LoginUser(BaseService):
         user = authenticate(username=username, password=password)
 
         if not user:
-            raise AuthenticationFailed
+            raise AuthenticationFailed("Invalid username or password")
 
-        access_token = generate_access_token(user)
-        refresh_token = generate_refresh_token(user)
-        return {"access_token": access_token, "refresh_token": refresh_token}
+        token_serializer = TokenObtainPairSerializer(
+            data={"username": username, "password": password}
+        )
+        token_serializer.is_valid(raise_exception=True)
+
+        return {
+            "access_token": token_serializer.validated_data["access"],
+            "refresh_token": token_serializer.validated_data["refresh"],
+        }

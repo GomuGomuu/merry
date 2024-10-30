@@ -2,9 +2,12 @@ from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAdminUser, AllowAny
+from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
 from drf_spectacular.utils import extend_schema
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .serializers import UserSerializer, SignupSerializer, SigninSerializer
 from .services.user_services import GetAllUsers, CreateNewUser, LoginUser
@@ -35,7 +38,7 @@ def signup(request: Request) -> Response:
     """
     Create a new user.
     """
-    serializer = SignupSerializer(data=request.headers)
+    serializer = SignupSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         try:
             user = CreateNewUser().execute(**serializer.validated_data)
@@ -56,8 +59,8 @@ def signin(request: Request) -> Response:
     """
     Login a user.
     """
-    serializer = SigninSerializer(data=request.headers)
-    if serializer.is_valid():
+    serializer = SigninSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
         user = LoginUser().execute(**serializer.validated_data)
         if user:
             response = Response()
@@ -72,3 +75,28 @@ def signin(request: Request) -> Response:
             return response
 
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class RefreshTokenView(TokenRefreshView):
+    @extend_schema(**docs.token_refresh)
+    @csrf_exempt
+    @permission_classes((IsAuthenticated,))
+    def post(self, request: Request) -> Response:
+        """
+        Refresh a token.
+        """
+        refresh = request.data.get("refresh")
+
+        try:
+            token = RefreshToken(refresh)
+            data = {
+                "access": str(token.access_token),
+                "refresh": str(token),
+            }
+            return Response(data, status=status.HTTP_200_OK)
+
+        except TokenError:
+            return Response(
+                {"detail": "Token has expired or is invalid."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )

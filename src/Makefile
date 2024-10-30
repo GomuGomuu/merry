@@ -30,6 +30,7 @@ restore-db:
 
 restore-media:
 	@echo "Restoring media files..."
+	@if [ ! -d "$(MEDIA_DIR)" ]; then mkdir -p $(MEDIA_DIR); fi
 	tar -xzvf $(MEDIA_BACKUP) -C $(MEDIA_DIR)
 
 backup:
