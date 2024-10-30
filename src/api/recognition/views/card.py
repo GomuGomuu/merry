@@ -72,7 +72,9 @@ def card_recognition(request):
             for card in card_matcher_response:
                 card["data"] = CardSerializer(cards.get(slug=card["slug"])).data
                 for illustration in card["illustrations"]:
-                    card_illustration = CardIllustration.objects.get(code=illustration["code"])
+                    card_illustration = CardIllustration.objects.get(
+                        code=illustration["code"]
+                    )
                     illustration["data"] = CardIllustrationSerializer(
                         card_illustration
                     ).data

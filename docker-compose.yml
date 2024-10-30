@@ -48,7 +48,7 @@ services:
     container_name: merry-postgres
     image: postgres:14-bullseye
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - ./docker/db/pgdata:/var/lib/postgresql/data
     env_file: *env_file
@@ -66,7 +66,7 @@ services:
     image: redis:6-alpine
     container_name: redis
     ports:
-      - "6379:6379"
+      - "6380:6379"
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 30s
@@ -87,6 +87,8 @@ services:
     command: "celery -A config.celery:app worker --loglevel=info"
     networks:
       - backend
+    ports:
+        - "5555:5554"
 
 #  nginx:
 #    build:
@@ -107,7 +109,7 @@ services:
   flower:
     <<: *api-base
     ports:
-      - "5555:5555"
+      - "5556:5555"
     depends_on:
       - api
       - redis

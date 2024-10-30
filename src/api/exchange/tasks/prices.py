@@ -17,7 +17,8 @@ def update_card_prices():
             connection.id
             for connection in update_list
             if connection.card_illustration.prices.filter(
-                date__gt=timezone.now() - timedelta(days=1)).exists()
+                date__gt=timezone.now() - timedelta(days=1)
+            ).exists()
         ]
     )
 
