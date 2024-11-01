@@ -25,3 +25,16 @@ class Collection(BaseModel):
 
     def __str__(self):
         return f"{self.user.name} - {self.name}"
+
+    @property
+    def balance(self):
+        _balance = 0
+        for collection_illustration in self.collection_illustrations.all():
+            if collection_illustration.illustration.prices.exists():
+                _balance += collection_illustration.illustration.prices.last().price
+
+        return _balance
+
+    @property
+    def cards_quantity(self):
+        return self.illustrations.count()

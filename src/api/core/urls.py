@@ -16,6 +16,7 @@ urlpatterns = [
     path("cards/", include("api.card.urls")),
     path("exchange/", include("api.exchange.urls")),
     path("recognition/", include("api.recognition.urls")),
+    path("collection/", include("api.collection.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

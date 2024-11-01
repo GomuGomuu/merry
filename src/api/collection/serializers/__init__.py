@@ -1,1 +1,1 @@
-from .provider import *  # noqa
+from .collection import *  # noqa

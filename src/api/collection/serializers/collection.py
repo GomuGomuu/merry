@@ -25,8 +25,10 @@ class GetCollectionSerializer(serializers.Serializer):
         fields = ["collection_id"]
 
 
-class CollectionSerializer(serializers.Serializer):
+class CollectionSerializer(serializers.ModelSerializer):
+    cards_quantity = serializers.IntegerField(read_only=True)
+    balance = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+
     class Meta:
         model = Collection
-        fields = "__all__"
-        depth = 1
+        fields = ["id", "name", "cards_quantity", "balance"]

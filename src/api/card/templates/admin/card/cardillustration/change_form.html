@@ -1,0 +1,13 @@
+{% extends "admin/change_form.html" %}
+{% load admin_urls %}
+
+{% block object-tools-items %}
+    {{ block.super }}
+    <li>
+        <a href="{% url 'admin:cardillustration_update_price' original.pk|admin_urlquote %}"
+              style="background: var(--button-bg);"
+        >
+            Atualizar preço
+        </a>
+    </li>
+{% endblock %}

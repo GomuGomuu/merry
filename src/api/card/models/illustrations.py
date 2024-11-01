@@ -50,3 +50,9 @@ class CardIllustration(AbstractImage):
         self.visual_description = visual_description.to_dict()["data"]
         if save:
             self.save(update_fields=["visual_description"])
+
+    @property
+    def price(self):
+        if self.prices.exists():
+            return self.prices.last().price
+        return 0

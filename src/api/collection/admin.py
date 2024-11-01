@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 from django.db.models import Subquery, Min, Count
 from django.utils.safestring import mark_safe
@@ -14,15 +15,26 @@ class CollectionIllustrationAdmin(admin.ModelAdmin):
     search_fields = ["collection", "illustration__name"]
     list_display = ["collection", "illustration"]
     fields = ["collection", "illustration"]
+    autocomplete_fields = ["illustration"]
 
 
 class IllustrationInline(admin.TabularInline):
     model = CollectionIllustration
     extra = 0
     can_delete = False
+    can_add = False
     readonly_fields = [
         "thumbnail",
-        "illustration",
+        "illustration_display",
+        "illustration_price",
+        "illustration_total_price_amount",
+        "quantity_buttons",
+    ]
+    fields = [
+        "thumbnail",
+        "illustration_display",
+        "illustration_price",
+        "illustration_total_price_amount",
         "quantity_buttons",
     ]
 
@@ -44,10 +56,10 @@ class IllustrationInline(admin.TabularInline):
 
         return filtered_qs
 
-    def illustration(self, obj):
+    def illustration_display(self, obj):
         return obj.illustration
 
-    illustration.short_description = "Illustration"
+    illustration_display.short_description = "Illustration"
 
     def illustration_count_display(self, obj):
         illustration_count = CollectionIllustration.objects.filter(
@@ -55,11 +67,24 @@ class IllustrationInline(admin.TabularInline):
         ).count()
         return illustration_count
 
+    def illustration_price(self, obj):
+        return obj.illustration.price
+
+    illustration_price.short_description = "Price"
+
+    def illustration_total_price_amount(self, obj):
+        return obj.illustration.price * self.illustration_count_display(obj)
+
+    illustration_total_price_amount.short_description = "Total Price Amount"
+
     def thumbnail(self, obj):
         if obj.illustration.src:
+            url = reverse(
+                "admin:card_cardillustration_change", args=[obj.illustration.pk]
+            )
             return mark_safe(
-                '<img src="{}" style="max-height: 80px; max-width: 80px;" />'.format(
-                    obj.illustration.src.url
+                '<a href="{}"><img src="{}" style="max-height: 100px; max-width: 100px;" /></a>'.format(
+                    url, obj.illustration.src.url
                 )
             )
         return "-"
@@ -96,21 +121,31 @@ class IllustrationInline(admin.TabularInline):
             """
         )
 
-    quantity_buttons.short_description = "Quantidade"
+    quantity_buttons.short_description = "Quantity"
+
+
+class CollectionForm(forms.ModelForm):
+    class Meta:
+        model = Collection
+        fields = ["name", "user"]
 
 
 @admin.register(Collection)
 class CollectionAdmin(admin.ModelAdmin):
     list_filter = ["name"]
     search_fields = ["name", "user__name"]
-    list_display = ["name", "user", "illustration_count"]
-    fields = ["name", "user"]
+    list_display = ["name", "user", "illustration_count", "get_collection_balance"]
+    fields = ["name", "user", "get_collection_balance"]
+
+    readonly_fields = ["get_collection_balance", "illustration_count"]
+
     inlines = [IllustrationInline]
+    form = CollectionForm
 
     def illustration_count(self, obj):
         return CollectionIllustration.objects.filter(collection=obj).count()
 
-    illustration_count.short_description = "Contagem de Ilustrações"
+    illustration_count.short_description = "Illustration Count"
 
     def changelist_view(self, request, extra_context=None):
         if request.method == "POST":
@@ -119,20 +154,19 @@ class CollectionAdmin(admin.ModelAdmin):
             collection_id = request.POST.get("collection_id")
 
             if action == "add":
-                print(
-                    f"Adicionando ilustração {illustration_id} à coleção {collection_id}"
-                )
                 CollectionIllustration.objects.create(
                     collection_id=collection_id, illustration_id=illustration_id
                 )
             elif action == "remove":
-                print(
-                    f"Removendo ilustração {illustration_id} da coleção {collection_id}"
-                )
                 CollectionIllustration.objects.filter(
                     collection_id=collection_id, illustration_id=illustration_id
                 ).last().delete()
 
-            return redirect(request.path)
+            return redirect("admin:collection_collection_change", collection_id)
 
         return super().changelist_view(request, extra_context=extra_context)
+
+    def get_collection_balance(self, obj):
+        return f"R$ {obj.balance:.2f}"
+
+    get_collection_balance.short_description = "Wallet Balance"

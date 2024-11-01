@@ -1,7 +1,9 @@
 import logging
 import uuid
 from datetime import date
-
+from django.urls import path
+from django.shortcuts import redirect
+from django.contrib import messages
 from django.contrib.admin import SimpleListFilter
 from django.db.models import Count
 from django.urls import reverse
@@ -112,6 +114,7 @@ class CardIllustrationAdmin(admin.ModelAdmin):
     ]
 
     readonly_fields = ("code", "thumbnail")
+    change_form_template = "admin/card/cardillustration/change_form.html"
 
     actions = [
         "update_price",
@@ -130,22 +133,6 @@ class CardIllustrationAdmin(admin.ModelAdmin):
 
     thumbnail.short_description = "Thumbnail"
 
-    def update_price(self, request, queryset):
-        from api.card.services.update_price import update_card_price
-
-        for illustration in queryset:
-            try:
-                illustration_price = update_card_price(illustration)
-                self.message_user(
-                    request,
-                    f"Price for {illustration} updated to {illustration_price}",
-                    level="SUCCESS",
-                )
-            except Exception as e:
-                raise e
-
-    update_price.short_description = "Update Price"
-
     def update_illustration_type_action(self, request, queryset):
         update_illustration_type()
 
@@ -156,13 +143,55 @@ class CardIllustrationAdmin(admin.ModelAdmin):
 
     export_as_json_for_gemini.short_description = "Export as JSON for Gemini"
 
+    def update_price(self, request, queryset):
+        from api.card.services.update_price import update_card_price
+
+        for illustration in queryset:
+            try:
+                illustration_price = update_card_price(illustration)
+                self.message_user(
+                    request,
+                    f"Price for {illustration} updated to {illustration_price}",
+                    level=messages.SUCCESS,
+                )
+            except Exception as e:
+                self.message_user(request, f"Error: {e}", level=messages.ERROR)
+
+    update_price.short_description = "Update Price"
+
+    def update_price_single(self, request, illustration_id):
+        from api.card.services.update_price import update_card_price
+
+        try:
+            illustration = CardIllustration.objects.get(pk=illustration_id)
+            illustration_price = update_card_price(illustration)
+            self.message_user(
+                request,
+                f"Price for {illustration} updated to {illustration_price}",
+                level=messages.SUCCESS,
+            )
+        except Exception as e:
+            self.message_user(request, f"Error: {e}", level=messages.ERROR)
+
+        return redirect("admin:card_cardillustration_change", illustration_id)
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                "<path:illustration_id>/update-price/",
+                self.admin_site.admin_view(self.update_price_single),
+                name="cardillustration_update_price",
+            ),
+        ]
+        return custom_urls + urls
+
 
 class CardForm(forms.ModelForm):
     class Meta:
         model = Card
         fields = "__all__"
 
-    # apply slugify to the name field to generate the slug and save it
     prepopulated_fields = {"slug": ("name",)}
 
     def save(self, commit=True):
@@ -225,16 +254,12 @@ class CardAdmin(admin.ModelAdmin):
 
     colors.short_description = "Colors"
 
-    # Adicione o campo que calcula a contagem de ilustrações
     def illustrations_count(self, obj):
         return obj.illustrations_count
 
     illustrations_count.short_description = "Number of Illustrations"
-    illustrations_count.admin_order_field = (
-        "illustrations_count"  # Permite ordenar por essa coluna
-    )
+    illustrations_count.admin_order_field = "illustrations_count"
 
-    # Modifique o queryset para incluir a contagem de ilustrações
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.annotate(illustrations_count=Count("illustrations"))
