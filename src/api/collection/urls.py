@@ -7,4 +7,5 @@ urlpatterns = [
         "collection/<int:collection_id>/", views.get_collection, name="get_collection"
     ),
     path("collections/", views.collections, name="add_illustration_to_collection"),
+    path("manage-illustration/", views.manage_illustration_on_vault, name="manage_illustration_on_vault"),
 ]
