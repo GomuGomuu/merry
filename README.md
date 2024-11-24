@@ -18,7 +18,7 @@ Setting sail with Merry is easy peasy!
 
 1. **Clone the Repo:** 
    ```bash
-   git clone https://github.com/your-username/merry.git
+   git clone https://github.com/GomuGomuu/merry.git
    ```
 
 2. **Prepare the Environment:**
